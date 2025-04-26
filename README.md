@@ -1,59 +1,18 @@
-# danhlptn-random-tuong-lien-quan
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <title>Random Tướng Liên Quân</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 20px;
-      background: #f0f5f9;
-    }
-    h1 {
-      color: #3a7bd5;
-    }
-    .container {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      display: inline-block;
-      margin-top: 30px;
-    }
-    select, input[type="number"], button {
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #3a7bd5;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #2f5aa5;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 20px;
-      color: #333;
-      line-height: 1.5;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-[#12002f] min-h-screen flex flex-col items-center p-4">
 
-<h1>🎮 Random Tướng Liên Quân 🎮</h1>
+  <!-- Title -->
+  <h1 class="text-3xl md:text-5xl text-white font-bold mb-6 mt-4">🎮 Random Tướng Liên Quân 🎮</h1>
 
-<div class="container">
-  <div>
-    <label for="role">Chọn vai trò:</label>
-    <select id="role">
+  <!-- Filter + Search -->
+  <div class="flex flex-wrap justify-center gap-4 mb-6">
+    <select id="role" class="p-2 rounded-md bg-gray-700 text-white">
       <option value="all">Tất cả</option>
       <option value="dau-si">Đấu Sĩ</option>
       <option value="phap-su">Pháp Sư</option>
@@ -62,23 +21,27 @@
       <option value="do-don">Đỡ Đòn</option>
       <option value="tro-thu">Trợ Thủ</option>
     </select>
+
+    <input id="search" type="text" placeholder="Tìm kiếm tướng..." class="p-2 rounded-md bg-gray-700 text-white" oninput="searchTuong()">
+    
+    <button onclick="randomTuong()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+      Random
+    </button>
+    <button onclick="randomFullTeam()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
+      Random Full Team
+    </button>
   </div>
 
-  <div>
-    <label for="number">Số lượng tướng:</label>
-    <input type="number" id="number" value="1" min="1" max="10">
-  </div>
+  <!-- Kết quả random -->
+  <div id="result" class="text-center text-white text-2xl my-4"></div>
 
-  <div>
-    <button onclick="randomTuong()">Random Tướng</button>
-    <button onclick="randomFullTeam()">Random Full Team (5 tướng)</button>
+  <!-- Danh sách tướng -->
+  <div id="list" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+    <!-- Các tướng sẽ hiện ở đây -->
   </div>
-
-  <div id="result"></div>
-</div>
 
 <script>
-// Danh sách tướng theo vai trò
+// Dữ liệu tướng
 const tuongList = {
   "dau-si": ["Zuka", "Veres", "Richter", "Rourke", "Airi", "Arthur", "Superman", "Zephys", "Triệu Vân", "Omen", "Maloch", "Skud", "Tachi", "Lữ Bố", "Kil’Groth", "Errol", "Wiro", "Florentino", "Qi", "Amily", "Allain", "Roxie", "Volkath", "Ryoma", "Astrid", "Yan", "Wonder Woman", "Taara", "Dextra", "Yena", "Arduin", "Bijan", "Charlotte"],
   "phap-su": ["Dirak", "Raz", "Preyta", "Natalya", "Ignis", "Lauriel", "Điêu Thuyền", "Veera", "Marja", "Tulen", "Krixi", "Mganga", "Liliana", "Kahlii", "Yue", "Annette", "Sephera", "Ilumia", "Ishar", "Zata", "Jinna", "Aleister", "Azzen’Ka", "D’Arcy", "Lorion", "Sephora", "Iginis"],
@@ -87,61 +50,61 @@ const tuongList = {
   "do-don": ["Toro", "Gildur", "Grakk", "Sephera", "Helen", "Ishar", "Krizzix", "Chaugnar", "Annette", "Baldum", "Omega", "Dolia", "Arum", "Lumburr", "Skud", "Maloch", "Wiro", "Roxie", "Dextra", "Arduin", "Y’bneth", "Cresht", "Thane", "Taara"],
   "tro-thu": ["Alice", "Annette", "Sephera", "Krizzix", "Chaugnar", "Baldum", "Omega", "Dolia", "Arum", "Lumburr", "Teemee", "Zip", "Rouie", "Helen", "Ishar", "Payna", "Y’bneth", "Cresht", "Thane"]
 };
+const tatCaTuong = Object.values(tuongList).flat();
 
-// Gom toàn bộ tướng
-const tatCaTuong = [].concat(
-  tuongList["dau-si"],
-  tuongList["phap-su"],
-  tuongList["xa-thu"],
-  tuongList["sat-thu"],
-  tuongList["do-don"],
-  tuongList["tro-thu"]
-);
+function renderTuong(list) {
+  const listDiv = document.getElementById('list');
+  listDiv.innerHTML = '';
 
-// Hàm random chung
-function randomTuongList(list, number) {
-  const result = [];
-  const tempList = [...list];
+  list.forEach(name => {
+    const item = document.createElement('div');
+    item.className = "bg-[#1e1e3f] p-4 rounded-xl text-center text-white hover:bg-[#2c2c5f] cursor-pointer transition";
 
-  for (let i = 0; i < number && tempList.length > 0; i++) {
-    const randomIndex = Math.floor(Math.random() * tempList.length);
-    result.push(tempList[randomIndex]);
-    tempList.splice(randomIndex, 1);
-  }
+    item.innerHTML = `
+      <div class="text-5xl mb-2">🎯</div>
+      <div class="text-sm font-bold">${name}</div>
+    `;
 
-  return result;
+    listDiv.appendChild(item);
+  });
 }
 
-// Random theo số lượng người dùng nhập
 function randomTuong() {
   const role = document.getElementById('role').value;
-  const number = parseInt(document.getElementById('number').value);
+  const list = role === 'all' ? tatCaTuong : tuongList[role];
+  const randomHero = list[Math.floor(Math.random() * list.length)];
 
-  let list;
-  if (role === "all") {
-    list = tatCaTuong;
-  } else {
-    list = tuongList[role];
-  }
-
-  const result = randomTuongList(list, number);
-  document.getElementById('result').innerHTML = result.join('<br>');
+  document.getElementById('result').innerHTML = `🎯 Bạn random được: <strong>${randomHero}</strong>`;
 }
 
-// Random đúng 5 tướng cho full team
 function randomFullTeam() {
   const role = document.getElementById('role').value;
+  const list = role === 'all' ? [...tatCaTuong] : [...tuongList[role]];
 
-  let list;
-  if (role === "all") {
-    list = tatCaTuong;
-  } else {
-    list = tuongList[role];
+  const team = [];
+  while (team.length < 5 && list.length > 0) {
+    const randomIndex = Math.floor(Math.random() * list.length);
+    team.push(list[randomIndex]);
+    list.splice(randomIndex, 1);
   }
 
-  const result = randomTuongList(list, 5);
-  document.getElementById('result').innerHTML = "<strong>🛡️ Đội hình Full Team:</strong><br>" + result.join('<br>');
+  document.getElementById('result').innerHTML = `
+    🛡️ Đội hình: <br>
+    ${team.map(name => `<strong>${name}</strong>`).join('<br>')}
+  `;
 }
+
+function searchTuong() {
+  const keyword = document.getElementById('search').value.toLowerCase();
+  const role = document.getElementById('role').value;
+  const list = role === 'all' ? tatCaTuong : tuongList[role];
+
+  const filtered = list.filter(name => name.toLowerCase().includes(keyword));
+  renderTuong(filtered);
+}
+
+// Mặc định render tất cả
+renderTuong(tatCaTuong);
 </script>
 
 </body>
