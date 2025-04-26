@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Tướng Liên Quân</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f0f5f9;
+    }
+    h1 {
+      color: #3a7bd5;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      display: inline-block;
+      margin-top: 30px;
+    }
+    select, input[type="number"], button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #3a7bd5;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2f5aa5;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #333;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎮 Random Tướng Liên Quân 🎮</h1>
+
+<div class="container">
+  <div>
+    <label for="role">Chọn vai trò:</label>
+    <select id="role">
+      <option value="all">Tất cả</option>
+      <option value="dau-si">Đấu Sĩ</option>
+      <option value="phap-su">Pháp Sư</option>
+      <option value="xa-thu">Xạ Thủ</option>
+      <option value="sat-thu">Sát Thủ</option>
+      <option value="do-don">Đỡ Đòn</option>
+      <option value="tro-thu">Trợ Thủ</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="number">Số lượng tướng:</label>
+    <input type="number" id="number" value="1" min="1" max="10">
+  </div>
+
+  <div>
+    <button onclick="randomTuong()">Random Tướng</button>
+    <button onclick="randomFullTeam()">Random Full Team (5 tướng)</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+// Danh sách tướng theo vai trò
+const tuongList = {
+  "dau-si": ["Zuka", "Veres", "Richter", "Rourke", "Airi", "Arthur", "Superman", "Zephys", "Triệu Vân", "Omen", "Maloch", "Skud", "Tachi", "Lữ Bố", "Kil’Groth", "Errol", "Wiro", "Florentino", "Qi", "Amily", "Allain", "Roxie", "Volkath", "Ryoma", "Astrid", "Yan", "Wonder Woman", "Taara", "Dextra", "Yena", "Arduin", "Bijan", "Charlotte"],
+  "phap-su": ["Dirak", "Raz", "Preyta", "Natalya", "Ignis", "Lauriel", "Điêu Thuyền", "Veera", "Marja", "Tulen", "Krixi", "Mganga", "Liliana", "Kahlii", "Yue", "Annette", "Sephera", "Ilumia", "Ishar", "Zata", "Jinna", "Aleister", "Azzen’Ka", "D’Arcy", "Lorion", "Sephora", "Iginis"],
+  "xa-thu": ["Valhein", "Violet", "Yorn", "Fennik", "Slimz", "Joker", "Tel'Annas", "Moren", "Lindis", "Wisp", "Elsu", "Hayate", "Capheny", "Celica", "Eland’orr", "Laville", "Thorne", "Bright", "Heino"],
+  "sat-thu": ["Nakroth", "Murad", "Quillen", "Airi", "Butterfly", "Zill", "Kriknak", "Ngộ Không", "Keera", "Enzo", "Yan", "Volkath", "Ryoma", "Astrid", "Qi", "Bijan", "Paine", "Bright", "Allain", "Zata", "Raz", "Dirak", "Tachi", "Errol", "Zephys", "Superman"],
+  "do-don": ["Toro", "Gildur", "Grakk", "Sephera", "Helen", "Ishar", "Krizzix", "Chaugnar", "Annette", "Baldum", "Omega", "Dolia", "Arum", "Lumburr", "Skud", "Maloch", "Wiro", "Roxie", "Dextra", "Arduin", "Y’bneth", "Cresht", "Thane", "Taara"],
+  "tro-thu": ["Alice", "Annette", "Sephera", "Krizzix", "Chaugnar", "Baldum", "Omega", "Dolia", "Arum", "Lumburr", "Teemee", "Zip", "Rouie", "Helen", "Ishar", "Payna", "Y’bneth", "Cresht", "Thane"]
+};
+
+// Gom toàn bộ tướng
+const tatCaTuong = [].concat(
+  tuongList["dau-si"],
+  tuongList["phap-su"],
+  tuongList["xa-thu"],
+  tuongList["sat-thu"],
+  tuongList["do-don"],
+  tuongList["tro-thu"]
+);
+
+// Hàm random chung
+function randomTuongList(list, number) {
+  const result = [];
+  const tempList = [...list];
+
+  for (let i = 0; i < number && tempList.length > 0; i++) {
+    const randomIndex = Math.floor(Math.random() * tempList.length);
+    result.push(tempList[randomIndex]);
+    tempList.splice(randomIndex, 1);
+  }
+
+  return result;
+}
+
+// Random theo số lượng người dùng nhập
+function randomTuong() {
+  const role = document.getElementById('role').value;
+  const number = parseInt(document.getElementById('number').value);
+
+  let list;
+  if (role === "all") {
+    list = tatCaTuong;
+  } else {
+    list = tuongList[role];
+  }
+
+  const result = randomTuongList(list, number);
+  document.getElementById('result').innerHTML = result.join('<br>');
+}
+
+// Random đúng 5 tướng cho full team
+function randomFullTeam() {
+  const role = document.getElementById('role').value;
+
+  let list;
+  if (role === "all") {
+    list = tatCaTuong;
+  } else {
+    list = tuongList[role];
+  }
+
+  const result = randomTuongList(list, 5);
+  document.getElementById('result').innerHTML = "<strong>🛡️ Đội hình Full Team:</strong><br>" + result.join('<br>');
+}
+</script>
+
+</body>
+</html>
