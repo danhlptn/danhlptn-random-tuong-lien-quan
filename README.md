@@ -2,104 +2,418 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Random Tướng Liên Quân</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Hiệu ứng xoay khi random */
+    .spin {
+      animation: spin 1s infinite linear;
+    }
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Hiệu ứng phát sáng khi kết thúc */
+    .glow {
+      animation: glow 0.5s ease-in-out;
+    }
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
+      }
+      50% {
+        box-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700;
+      }
+      100% {
+        box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
+      }
+    }
+  </style>
 </head>
-<body class="bg-[#12002f] min-h-screen flex flex-col items-center p-4">
+<body class="bg-[#1a1a2e] min-h-screen flex flex-col items-center p-4">
 
-  <!-- Title -->
-  <h1 class="text-3xl md:text-5xl text-white font-bold mb-6 mt-4">🎮 Random Tướng Liên Quân 🎮</h1>
+  <!-- Âm thanh -->
+  <audio id="rollSound" src="/sounds/roll-sound.mp3"></audio>
+  <audio id="resultSound" src="/sounds/result-sound.mp3"></audio>
 
-  <!-- Filter + Search -->
-  <div class="flex flex-wrap justify-center gap-4 mb-6">
-    <select id="role" class="p-2 rounded-md bg-gray-700 text-white">
-      <option value="all">Tất cả</option>
-      <option value="dau-si">Đấu Sĩ</option>
-      <option value="phap-su">Pháp Sư</option>
-      <option value="xa-thu">Xạ Thủ</option>
-      <option value="sat-thu">Sát Thủ</option>
-      <option value="do-don">Đỡ Đòn</option>
-      <option value="tro-thu">Trợ Thủ</option>
-    </select>
+  <!-- Header: Logo -->
+  <div class="my-4">
+    <img src="/images/lien-quan-logo.png" alt="Liên Quân Mobile Logo" class="h-16 mx-auto">
+  </div>
 
-    <input id="search" type="text" placeholder="Tìm kiếm tướng..." class="p-2 rounded-md bg-gray-700 text-white" oninput="searchTuong()">
-    
-    <button onclick="randomTuong()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+  <!-- Filter Buttons -->
+  <div class="flex flex-wrap justify-center gap-2 mb-4">
+    <button onclick="filterRole('all')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Tất cả</button>
+    <button onclick="filterRole('dau-si')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Đấu Sĩ</button>
+    <button onclick="filterRole('phap-su')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Pháp Sư</button>
+    <button onclick="filterRole('xa-thu')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Xạ Thủ</button>
+    <button onclick="filterRole('sat-thu')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Sát Thủ</button>
+    <button onclick="filterRole('do-don')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Đỡ Đòn</button>
+    <button onclick="filterRole('tro-thu')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Trợ Thủ</button>
+  </div>
+
+  <!-- Search -->
+  <div class="w-full max-w-md mb-4">
+    <input id="search" type="text" placeholder="Tìm kiếm tướng..." class="w-full p-2 rounded-md bg-[#2c2c5f] text-white" oninput="searchTuong()">
+  </div>
+
+  <!-- Kết quả random -->
+  <div id="result" class="text-center text-white my-6">
+    <!-- Kết quả sẽ hiển thị ở đây -->
+  </div>
+
+  <!-- Nút Random -->
+  <div class="flex justify-center gap-4 mb-6">
+    <button onclick="randomTuong()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-xl">
       Random
     </button>
-    <button onclick="randomFullTeam()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
+    <button onclick="randomFullTeam()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-xl">
       Random Full Team
     </button>
   </div>
 
-  <!-- Kết quả random -->
-  <div id="result" class="text-center text-white text-2xl my-4"></div>
-
   <!-- Danh sách tướng -->
-  <div id="list" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+  <div id="list" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 max-w-5xl">
     <!-- Các tướng sẽ hiện ở đây -->
   </div>
 
 <script>
-// Dữ liệu tướng
+// Dữ liệu tướng và hình ảnh
 const tuongList = {
-  "dau-si": ["Zuka", "Veres", "Richter", "Rourke", "Airi", "Arthur", "Superman", "Zephys", "Triệu Vân", "Omen", "Maloch", "Skud", "Tachi", "Lữ Bố", "Kil’Groth", "Errol", "Wiro", "Florentino", "Qi", "Amily", "Allain", "Roxie", "Volkath", "Ryoma", "Astrid", "Yan", "Wonder Woman", "Taara", "Dextra", "Yena", "Arduin", "Bijan", "Charlotte"],
-  "phap-su": ["Dirak", "Raz", "Preyta", "Natalya", "Ignis", "Lauriel", "Điêu Thuyền", "Veera", "Marja", "Tulen", "Krixi", "Mganga", "Liliana", "Kahlii", "Yue", "Annette", "Sephera", "Ilumia", "Ishar", "Zata", "Jinna", "Aleister", "Azzen’Ka", "D’Arcy", "Lorion", "Sephora", "Iginis"],
-  "xa-thu": ["Valhein", "Violet", "Yorn", "Fennik", "Slimz", "Joker", "Tel'Annas", "Moren", "Lindis", "Wisp", "Elsu", "Hayate", "Capheny", "Celica", "Eland’orr", "Laville", "Thorne", "Bright", "Heino"],
-  "sat-thu": ["Nakroth", "Murad", "Quillen", "Airi", "Butterfly", "Zill", "Kriknak", "Ngộ Không", "Keera", "Enzo", "Yan", "Volkath", "Ryoma", "Astrid", "Qi", "Bijan", "Paine", "Bright", "Allain", "Zata", "Raz", "Dirak", "Tachi", "Errol", "Zephys", "Superman"],
-  "do-don": ["Toro", "Gildur", "Grakk", "Sephera", "Helen", "Ishar", "Krizzix", "Chaugnar", "Annette", "Baldum", "Omega", "Dolia", "Arum", "Lumburr", "Skud", "Maloch", "Wiro", "Roxie", "Dextra", "Arduin", "Y’bneth", "Cresht", "Thane", "Taara"],
-  "tro-thu": ["Alice", "Annette", "Sephera", "Krizzix", "Chaugnar", "Baldum", "Omega", "Dolia", "Arum", "Lumburr", "Teemee", "Zip", "Rouie", "Helen", "Ishar", "Payna", "Y’bneth", "Cresht", "Thane"]
+  "dau-si": [
+    { name: "Zuka", image: "/images/zuka.png" },
+    { name: "Veres", image: "/images/veres.png" },
+    { name: "Richter", image: "/images/richter.png" },
+    { name: "Rourke", image: "/images/rourke.png" },
+    { name: "Airi", image: "/images/airi.png" },
+    { name: "Arthur", image: "/images/arthur.png" },
+    { name: "Superman", image: "/images/superman.png" },
+    { name: "Zephys", image: "/images/zephys.png" },
+    { name: "Triệu Vân", image: "/images/trieu-van.png" },
+    { name: "Omen", image: "/images/omen.png" },
+    { name: "Maloch", image: "/images/maloch.png" },
+    { name: "Skud", image: "/images/skud.png" },
+    { name: "Tachi", image: "/images/tachi.png" },
+    { name: "Lữ Bố", image: "/images/lu-bo.png" },
+    { name: "Kil’Groth", image: "/images/kilgroth.png" },
+    { name: "Errol", image: "/images/errol.png" },
+    { name: "Wiro", image: "/images/wiro.png" },
+    { name: "Florentino", image: "/images/florentino.png" },
+    { name: "Qi", image: "/images/qi.png" },
+    { name: "Amily", image: "/images/amily.png" },
+    { name: "Allain", image: "/images/allain.png" },
+    { name: "Roxie", image: "/images/roxie.png" },
+    { name: "Volkath", image: "/images/volkath.png" },
+    { name: "Ryoma", image: "/images/ryoma.png" },
+    { name: "Astrid", image: "/images/astrid.png" },
+    { name: "Yan", image: "/images/yan.png" },
+    { name: "Wonder Woman", image: "/images/wonder-woman.png" },
+    { name: "Taara", image: "/images/taara.png" },
+    { name: "Dextra", image: "/images/dextra.png" },
+    { name: "Yena", image: "/images/yena.png" },
+    { name: "Arduin", image: "/images/arduin.png" },
+    { name: "Bijan", image: "/images/bijan.png" },
+    { name: "Charlotte", image: "/images/charlotte.png" },
+    { name: "Thorne", image: "/images/thorne.png" },
+    { name: "Heino", image: "/images/heino.png" },
+    { name: "Aoi", image: "/images/aoi.png" },
+    { name: "Bolt Baron", image: "/images/bolt-baron.png" },
+    { name: "Biron", image: "/images/biron.png" },
+    { name: "Ormarr", image: "/images/ormarr.png" },
+    { name: "Billow", image: "/images/billow.png" }
+  ],
+  "phap-su": [
+    { name: "Dirak", image: "/images/dirak.png" },
+    { name: "Raz", image: "/images/raz.png" },
+    { name: "Preyta", image: "/images/preyta.png" },
+    { name: "Natalya", image: "/images/natalya.png" },
+    { name: "Ignis", image: "/images/ignis.png" },
+    { name: "Lauriel", image: "/images/lauriel.png" },
+    { name: "Điêu Thuyền", image: "/images/dieu-thuyen.png" },
+    { name: "Veera", image: "/images/veera.png" },
+    { name: "Marja", image: "/images/marja.png" },
+    { name: "Tulen", image: "/images/tulen.png" },
+    { name: "Krixi", image: "/images/krixi.png" },
+    { name: "Mganga", image: "/images/mganga.png" },
+    { name: "Liliana", image: "/images/liliana.png" },
+    { name: "Kahlii", image: "/images/kahlii.png" },
+    { name: "Yue", image: "/images/yue.png" },
+    { name: "Annette", image: "/images/annette.png" },
+    { name: "Sephera", image: "/images/sephera.png" },
+    { name: "Ilumia", image: "/images/ilumia.png" },
+    { name: "Ishar", image: "/images/ishar.png" },
+    { name: "Zata", image: "/images/zata.png" },
+    { name: "Jinna", image: "/images/jinna.png" },
+    { name: "Aleister", image: "/images/aleister.png" },
+    { name: "Azzen’Ka", image: "/images/azzenka.png" },
+    { name: "D’Arcy", image: "/images/darcy.png" },
+    { name: "Lorion", image: "/images/lorion.png" },
+    { name: "Sephora", image: "/images/sephora.png" },
+    { name: "Iginis", image: "/images/iginis.png" },
+    { name: "Ming", image: "/images/ming.png" },
+    { name: "Iggy", image: "/images/iggy.png" },
+    { name: "Bonnie", image: "/images/bonie.png" }
+  ],
+  "xa-thu": [
+    { name: "Valhein", image: "/images/valhein.png" },
+    { name: "Violet", image: "/images/violet.png" },
+    { name: "Yorn", image: "/images/yorn.png" },
+    { name: "Fennik", image: "/images/fennik.png" },
+    { name: "Slimz", image: "/images/slimz.png" },
+    { name: "Joker", image: "/images/joker.png" },
+    { name: "Tel’Annas", image: "/images/telannas.png" },
+    { name: "Moren", image: "/images/moren.png" },
+    { name: "Lindis", image: "/images/lindis.png" },
+    { name: "Wisp", image: "/images/wisp.png" },
+    { name: "Elsu", image: "/images/elsu.png" },
+    { name: "Hayate", image: "/images/hayate.png" },
+    { name: "Capheny", image: "/images/capheny.png" },
+    { name: "Celica", image: "/images/celica.png" },
+    { name: "Eland’orr", image: "/images/elandorr.png" },
+    { name: "Laville", image: "/images/laville.png" },
+    { name: "Thorne", image: "/images/thorne.png" },
+    { name: "Bright", image: "/images/bright.png" },
+    { name: "Heino", image: "/images/heino.png" },
+    { name: "Teeri", image: "/images/teeri.png" },
+    { name: "Yan", image: "/images/yan.png" },
+    { name: "Stuart", image: "/images/stuart.png" }
+  ],
+  "sat-thu": [
+    { name: "Nakroth", image: "/images/nakroth.png" },
+    { name: "Murad", image: "/images/murad.png" },
+    { name: "Quillen", image: "/images/quillen.png" },
+    { name: "Airi", image: "/images/airi.png" },
+    { name: "Butterfly", image: "/images/butterfly.png" },
+    { name: "Zill", image: "/images/zill.png" },
+    { name: "Kriknak", image: "/images/kriknak.png" },
+    { name: "Ngộ Không", image: "/images/ngo-khong.png" },
+    { name: "Keera", image: "/images/keera.png" },
+    { name: "Enzo", image: "/images/enzo.png" },
+    { name: "Yan", image: "/images/yan.png" },
+    { name: "Volkath", image: "/images/volkath.png" },
+    { name: "Ryoma", image: "/images/ryoma.png" },
+    { name: "Astrid", image: "/images/astrid.png" },
+    { name: "Qi", image: "/images/qi.png" },
+    { name: "Bijan", image: "/images/bijan.png" },
+    { name: "Paine", image: "/images/paine.png" },
+    { name: "Bright", image: "/images/bright.png" },
+    { name: "Allain", image: "/images/allain.png" },
+    { name: "Zata", image: "/images/zata.png" },
+    { name: "Raz", image: "/images/raz.png" },
+    { name: "Dirak", image: "/images/dirak.png" },
+    { name: "Tachi", image: "/images/tachi.png" },
+    { name: "Errol", image: "/images/errol.png" },
+    { name: "Zephys", image: "/images/zephys.png" },
+    { name: "Superman", image: "/images/superman.png" },
+    { name: "The Flash", image: "/images/the-flash.png" },
+    { name: "Kaine", image: "/images/kaine.png" },
+    { name: "Sinestrea", image: "/images/sinestrea.png" }
+  ],
+  "do-don": [
+    { name: "Toro", image: "/images/toro.png" },
+    { name: "Gildur", image: "/images/gildur.png" },
+    { name: "Grakk", image: "/images/grakk.png" },
+    { name: "Sephera", image: "/images/sephera.png" },
+    { name: "Helen", image: "/images/helen.png" },
+    { name: "Ishar", image: "/images/ishar.png" },
+    { name: "Krizzix", image: "/images/krizzix.png" },
+    { name: "Chaugnar", image: "/images/chaugnar.png" },
+    { name: "Annette", image: "/images/annette.png" },
+    { name: "Baldum", image: "/images/baldum.png" },
+    { name: "Omega", image: "/images/omega.png" },
+    { name: "Dolia", image: "/images/dolia.png" },
+    { name: "Arum", image: "/images/arum.png" },
+    { name: "Lumburr", image: "/images/lumburr.png" },
+    { name: "Skud", image: "/images/skud.png" },
+    { name: "Maloch", image: "/images/maloch.png" },
+    { name: "Wiro", image: "/images/wiro.png" },
+    { name: "Roxie", image: "/images/roxie.png" },
+    { name: "Dextra", image: "/images/dextra.png" },
+    { name: "Arduin", image: "/images/arduin.png" },
+    { name: "Y’bneth", image: "/images/ybneth.png" },
+    { name: "Cresht", image: "/images/cresht.png" },
+    { name: "Thane", image: "/images/thane.png" },
+    { name: "Taara", image: "/images/taara.png" },
+    { name: "Mina", image: "/images/mina.png" },
+    { name: "Xeniel", image: "/images/xeniel.png" }
+  ],
+  "tro-thu": [
+    { name: "Alice", image: "/images/alice.png" },
+    { name: "Annette", image: "/images/annette.png" },
+    { name: "Sephera", image: "/images/sephera.png" },
+    { name: "Krizzix", image: "/images/krizzix.png" },
+    { name: "Chaugnar", image: "/images/chaugnar.png" },
+    { name: "Baldum", image: "/images/baldum.png" },
+    { name: "Omega", image: "/images/omega.png" },
+    { name: "Dolia", image: "/images/dolia.png" },
+    { name: "Arum", image: "/images/arum.png" },
+    { name: "Lumburr", image: "/images/lumburr.png" },
+    { name: "Teemee", image: "/images/teemee.png" },
+    { name: "Zip", image: "/images/zip.png" },
+    { name: "Rouie", image: "/images/rouie.png" },
+    { name: "Helen", image: "/images/helen.png" },
+    { name: "Ishar", image: "/images/ishar.png" },
+    { name: "Payna", image: "/images/payna.png" },
+    { name: "Y’bneth", image: "/images/ybneth.png" },
+    { name: "Cresht", image: "/images/cresht.png" },
+    { name: "Thane", image: "/images/thane.png" },
+    { name: "Doria", image: "/images/doria.png" },
+    { name: "Xeniel", image: "/images/xeniel.png" }
+  ]
 };
 const tatCaTuong = Object.values(tuongList).flat();
+
+let currentRole = 'all'; // Biến lưu vai trò hiện tại
 
 function renderTuong(list) {
   const listDiv = document.getElementById('list');
   listDiv.innerHTML = '';
 
-  list.forEach(name => {
+  list.forEach(tuong => {
     const item = document.createElement('div');
-    item.className = "bg-[#1e1e3f] p-4 rounded-xl text-center text-white hover:bg-[#2c2c5f] cursor-pointer transition";
+    item.className = "bg-[#2c2c5f] p-2 rounded-lg text-center text-white hover:bg-[#3c3c7f] cursor-pointer transition";
 
     item.innerHTML = `
-      <div class="text-5xl mb-2">🎯</div>
-      <div class="text-sm font-bold">${name}</div>
+      <img src="${tuong.image}" alt="${tuong.name}" class="w-30 h-30 mx-auto rounded-md">
+      <div class="text-sm font-bold mt-2">${tuong.name}</div>
     `;
 
     listDiv.appendChild(item);
   });
 }
 
-function randomTuong() {
-  const role = document.getElementById('role').value;
+// Hàm lọc theo vai trò
+function filterRole(role) {
+  currentRole = role;
   const list = role === 'all' ? tatCaTuong : tuongList[role];
-  const randomHero = list[Math.floor(Math.random() * list.length)];
+  renderTuong(list);
+}
 
-  document.getElementById('result').innerHTML = `🎯 Bạn random được: <strong>${randomHero}</strong>`;
+// Hàm phát âm thanh với xử lý lỗi
+function playSound(audio) {
+  if (audio) {
+    audio.play().catch(error => {
+      console.log('Error playing sound:', error);
+    });
+  }
+}
+
+// Hàm tạo hiệu ứng tên chạy trong 3 giây
+function runRandomEffect(list, isTeam, callback) {
+  const resultDiv = document.getElementById('result');
+  let counter = 0;
+  const duration = 3000; // 3 giây
+  const interval = 100; // Cập nhật tên mỗi 100ms
+
+  // Phát âm thanh khi bắt đầu random
+  const rollSound = document.getElementById('rollSound');
+  playSound(rollSound);
+
+  if (isTeam) {
+    // Hiệu ứng cho 5 tướng
+    const intervalId = setInterval(() => {
+      const tempTeam = [];
+      for (let i = 0; i < 5; i++) {
+        tempTeam.push(list[Math.floor(Math.random() * list.length)]);
+      }
+      resultDiv.innerHTML = `
+        <div class="flex flex-wrap justify-center gap-4">
+          ${tempTeam.map(tuong => `
+            <div class="text-center">
+              <img src="${tuong.image}" alt="${tuong.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 spin">
+              <div class="text-lg font-bold mt-2">${tuong.name}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      counter += interval;
+
+      if (counter >= duration) {
+        clearInterval(intervalId);
+        if (rollSound) {
+          rollSound.pause();
+          rollSound.currentTime = 0;
+        }
+        playSound(document.getElementById('resultSound')); // Phát âm thanh khi kết thúc
+        callback(); // Gọi hàm hiển thị kết quả cuối cùng
+      }
+    }, interval);
+  } else {
+    // Hiệu ứng cho 1 tướng
+    const intervalId = setInterval(() => {
+      const randomHero = list[Math.floor(Math.random() * list.length)];
+      resultDiv.innerHTML = `
+        <div class="text-center">
+          <img src="${randomHero.image}" alt="${randomHero.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 spin">
+          <div class="text-xl font-bold mt-2">${randomHero.name}</div>
+        </div>
+      `;
+      counter += interval;
+
+      if (counter >= duration) {
+        clearInterval(intervalId);
+        if (rollSound) {
+          rollSound.pause();
+          rollSound.currentTime = 0;
+        }
+        playSound(document.getElementById('resultSound')); // Phát âm thanh khi kết thúc
+        callback(); // Gọi hàm hiển thị kết quả cuối cùng
+      }
+    }, interval);
+  }
+}
+
+function randomTuong() {
+  const list = currentRole === 'all' ? tatCaTuong : tuongList[currentRole];
+
+  // Chạy hiệu ứng 3 giây cho 1 tướng
+  runRandomEffect(list, false, () => {
+    const randomHero = list[Math.floor(Math.random() * list.length)];
+    document.getElementById('result').innerHTML = `
+      <div class="text-center">
+        <img src="${randomHero.image}" alt="${randomHero.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 glow">
+        <div class="text-xl font-bold mt-2">${randomHero.name}</div>
+      </div>
+    `;
+  });
 }
 
 function randomFullTeam() {
-  const role = document.getElementById('role').value;
-  const list = role === 'all' ? [...tatCaTuong] : [...tuongList[role]];
+  const list = currentRole === 'all' ? [...tatCaTuong] : [...tuongList[currentRole]];
 
-  const team = [];
-  while (team.length < 5 && list.length > 0) {
-    const randomIndex = Math.floor(Math.random() * list.length);
-    team.push(list[randomIndex]);
-    list.splice(randomIndex, 1);
-  }
+  // Chạy hiệu ứng 3 giây cho 5 tướng
+  runRandomEffect(list, true, () => {
+    const team = [];
+    while (team.length < 5 && list.length > 0) {
+      const randomIndex = Math.floor(Math.random() * list.length);
+      team.push(list[randomIndex]);
+      list.splice(randomIndex, 1); // Xóa tướng đã chọn để tránh trùng
+    }
 
-  document.getElementById('result').innerHTML = `
-    🛡️ Đội hình: <br>
-    ${team.map(name => `<strong>${name}</strong>`).join('<br>')}
-  `;
+    document.getElementById('result').innerHTML = `
+      <div class="flex flex-wrap justify-center gap-4">
+        ${team.map(tuong => `
+          <div class="text-center">
+            <img src="${tuong.image}" alt="${tuong.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 glow">
+            <div class="text-lg font-bold mt-2">${tuong.name}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  });
 }
 
 function searchTuong() {
   const keyword = document.getElementById('search').value.toLowerCase();
-  const role = document.getElementById('role').value;
-  const list = role === 'all' ? tatCaTuong : tuongList[role];
+  const list = currentRole === 'all' ? tatCaTuong : tuongList[currentRole];
 
-  const filtered = list.filter(name => name.toLowerCase().includes(keyword));
+  const filtered = list.filter(tuong => tuong.name.toLowerCase().includes(keyword));
   renderTuong(filtered);
 }
 
