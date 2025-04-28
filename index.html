@@ -34,13 +34,152 @@
         box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
       }
     }
+
+    /* Hiệu ứng hover cho nút */
+    .button-glow {
+      transition: all 0.3s ease;
+    }
+    .button-glow:hover {
+      box-shadow: 0 0 15px #ff0000, 0 0 25px #ff0000;
+      transform: scale(1.05);
+    }
+
+    /* Gradient nền */
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2c2c5f 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Đường kẻ trang trí trên nền */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(45deg, transparent, #ffd700, transparent);
+      opacity: 0.3;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(45deg, transparent, #ffd700, transparent);
+      opacity: 0.3;
+      clip-path: polygon(100% 100%, 0 100%, 100% 0);
+      z-index: 0;
+    }
+
+    /* Thêm biểu tượng trang trí ở góc trên bên phải */
+    .corner-decoration {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 80px;
+      height: 80px;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    /* Đảm bảo nội dung nằm trên các đường kẻ */
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Khung tướng với viền gradient và bóng đổ */
+    .hero-card {
+      position: relative;
+      background: #2c2c5f;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      text-align: center;
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ffd700, #ff4d00);
+      border-radius: 0.75rem;
+      z-index: -1;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Nút với viền gradient đỏ-đen */
+    .custom-button {
+      position: relative;
+      z-index: 1;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      color: white;
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .custom-button::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff0000, #000000);
+      border-radius: 0.75rem;
+      z-index: -1;
+    }
+
+    /* Nút filter với viền gradient đỏ-đen */
+    .filter-button {
+      position: relative;
+      z-index: 1;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: white;
+      font-weight: bold;
+    }
+
+    .filter-button::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff0000, #000000);
+      border-radius: 0.75rem;
+      z-index: -1;
+    }
   </style>
 </head>
-<body class="bg-[#1a1a2e] min-h-screen flex flex-col items-center p-4">
+<body class="min-h-screen flex flex-col items-center p-4">
 
   <!-- Âm thanh -->
   <audio id="rollSound" src="sounds/roll-sound.mp3"></audio>
   <audio id="resultSound" src="sounds/result-sound.mp3"></audio>
+
+  <!-- Biểu tượng trang trí ở góc trên bên phải -->
+  <img src="https://via.placeholder.com/80x80?text=Icon" alt="Corner Decoration" class="corner-decoration">
 
   <!-- Header: Logo -->
   <div class="my-4">
@@ -49,13 +188,13 @@
 
   <!-- Filter Buttons -->
   <div class="flex flex-wrap justify-center gap-2 mb-4">
-    <button onclick="filterRole('all')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Tất cả</button>
-    <button onclick="filterRole('dau-si')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Đấu Sĩ</button>
-    <button onclick="filterRole('phap-su')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Pháp Sư</button>
-    <button onclick="filterRole('xa-thu')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Xạ Thủ</button>
-    <button onclick="filterRole('sat-thu')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Sát Thủ</button>
-    <button onclick="filterRole('do-don')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Đỡ Đòn</button>
-    <button onclick="filterRole('tro-thu')" class="bg-[#2c2c5f] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#3c3c7f] transition">Trợ Thủ</button>
+    <button onclick="filterRole('all')" class="filter-button bg-[#2c2c5f] button-glow">Tất cả</button>
+    <button onclick="filterRole('dau-si')" class="filter-button bg-[#2c2c5f] button-glow">Đấu Sĩ</button>
+    <button onclick="filterRole('phap-su')" class="filter-button bg-[#2c2c5f] button-glow">Pháp Sư</button>
+    <button onclick="filterRole('xa-thu')" class="filter-button bg-[#2c2c5f] button-glow">Xạ Thủ</button>
+    <button onclick="filterRole('sat-thu')" class="filter-button bg-[#2c2c5f] button-glow">Sát Thủ</button>
+    <button onclick="filterRole('do-don')" class="filter-button bg-[#2c2c5f] button-glow">Đỡ Đòn</button>
+    <button onclick="filterRole('tro-thu')" class="filter-button bg-[#2c2c5f] button-glow">Trợ Thủ</button>
   </div>
 
   <!-- Search -->
@@ -70,10 +209,10 @@
 
   <!-- Nút Random -->
   <div class="flex justify-center gap-4 mb-6">
-    <button onclick="randomTuong()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-xl">
+    <button onclick="randomTuong()" class="custom-button bg-green-500 button-glow">
       Random
     </button>
-    <button onclick="randomFullTeam()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-xl">
+    <button onclick="randomFullTeam()" class="custom-button bg-blue-500 button-glow">
       Random Full Team
     </button>
   </div>
@@ -86,182 +225,182 @@
 <script>
 // Dữ liệu tướng và hình ảnh
 const tuongList = {
-            "dau-si": [
-                { name: "Zuka", image: "images/zuka.png" },
-                { name: "Veres", image: "images/veres.png" },
-                { name: "Richter", image: "images/richter.png" },
-                { name: "Rourke", image: "images/rourke.png" },
-                { name: "Airi", image: "images/airi.png" },
-                { name: "Arthur", image: "images/arthur.png" },
-                { name: "Superman", image: "images/superman.png" },
-                { name: "Zephys", image: "images/zephys.png" },
-                { name: "Triệu Vân", image: "images/trieu-van.png" },
-                { name: "Omen", image: "images/omen.png" },
-                { name: "Maloch", image: "images/maloch.png" },
-                { name: "Skud", image: "images/skud.png" },
-                { name: "Tachi", image: "images/tachi.png" },
-                { name: "Lữ Bố", image: "images/lu-bo.png" },
-                { name: "Kil’Groth", image: "images/kilgroth.png" },
-                { name: "Errol", image: "images/errol.png" },
-                { name: "Wiro", image: "images/wiro.png" },
-                { name: "Florentino", image: "images/florentino.png" },
-                { name: "Qi", image: "images/qi.png" },
-                { name: "Amily", image: "images/amily.png" },
-                { name: "Allain", image: "images/allain.png" },
-                { name: "Roxie", image: "images/roxie.png" },
-                { name: "Volkath", image: "images/volkath.png" },
-                { name: "Ryoma", image: "images/ryoma.png" },
-                { name: "Astrid", image: "images/astrid.png" },
-                { name: "Yan", image: "images/yan.png" },
-                { name: "Wonder Woman", image: "images/wonder-woman.png" },
-                { name: "Taara", image: "images/taara.png" },
-                { name: "Dextra", image: "images/dextra.png" },
-                { name: "Yena", image: "images/yena.png" },
-                { name: "Arduin", image: "images/arduin.png" },
-                { name: "Bijan", image: "images/bijan.png" },
-                { name: "Charlotte", image: "images/charlotte.png" },
-                { name: "Thorne", image: "images/thorne.png" },
-                { name: "Heino", image: "images/heino.png" },
-                { name: "Aoi", image: "images/aoi.png" },
-                { name: "Bolt Baron", image: "images/bolt-baron.png" },
-                { name: "Biron", image: "images/biron.png" },
-                { name: "Ormarr", image: "images/ormarr.png" },
-                { name: "Billow", image: "images/billow.png" }
-            ],
-            "phap-su": [
-                { name: "Dirak", image: "images/dirak.png" },
-                { name: "Raz", image: "images/raz.png" },
-                { name: "Preyta", image: "images/preyta.png" },
-                { name: "Natalya", image: "images/natalya.png" },
-                { name: "Ignis", image: "images/ignis.png" },
-                { name: "Lauriel", image: "images/lauriel.png" },
-                { name: "Điêu Thuyền", image: "images/dieu-thuyen.png" },
-                { name: "Veera", image: "images/veera.png" },
-                { name: "Marja", image: "images/marja.png" },
-                { name: "Tulen", image: "images/tulen.png" },
-                { name: "Krixi", image: "images/krixi.png" },
-                { name: "Mganga", image: "images/mganga.png" },
-                { name: "Liliana", image: "images/liliana.png" },
-                { name: "Kahlii", image: "images/kahlii.png" },
-                { name: "Yue", image: "images/yue.png" },
-                { name: "Annette", image: "images/annette.png" },
-                { name: "Sephera", image: "images/sephera.png" },
-                { name: "Ilumia", image: "images/ilumia.png" },
-                { name: "Ishar", image: "images/ishar.png" },
-                { name: "Zata", image: "images/zata.png" },
-                { name: "Jinna", image: "images/jinna.png" },
-                { name: "Aleister", image: "images/aleister.png" },
-                { name: "Azzen’Ka", image: "images/azzenka.png" },
-                { name: "D’Arcy", image: "images/darcy.png" },
-                { name: "Lorion", image: "images/lorion.png" },
-                { name: "Ming", image: "images/ming.png" },
-                { name: "Iggy", image: "images/iggy.png" },
-                { name: "Bonnie", image: "images/bonie.png" }
-            ],
-            "xa-thu": [
-                { name: "Valhein", image: "images/valhein.png" },
-                { name: "Violet", image: "images/violet.png" },
-                { name: "Yorn", image: "images/yorn.png" },
-                { name: "Fennik", image: "images/fennik.png" },
-                { name: "Slimz", image: "images/slimz.png" },
-                { name: "Tel’Annas", image: "images/telannas.png" },
-                { name: "Moren", image: "images/moren.png" },
-                { name: "Lindis", image: "images/lindis.png" },
-                { name: "Wisp", image: "images/wisp.png" },
-                { name: "Elsu", image: "images/elsu.png" },
-                { name: "Hayate", image: "images/hayate.png" },
-                { name: "Capheny", image: "images/capheny.png" },
-                { name: "Celica", image: "images/celica.png" },
-                { name: "Eland’orr", image: "images/elandorr.png" },
-                { name: "Laville", image: "images/laville.png" },
-                { name: "Thorne", image: "images/thorne.png" },
-                { name: "Bright", image: "images/bright.png" },
-                { name: "Heino", image: "images/heino.png" },
-                { name: "Teeri", image: "images/teeri.png" },
-                { name: "Yan", image: "images/yan.png" },
-                { name: "Stuart", image: "images/stuart.png" }
-            ],
-            "sat-thu": [
-                { name: "Nakroth", image: "images/nakroth.png" },
-                { name: "Murad", image: "images/murad.png" },
-                { name: "Quillen", image: "images/quillen.png" },
-                { name: "Airi", image: "images/airi.png" },
-                { name: "Butterfly", image: "images/butterfly.png" },
-                { name: "Zill", image: "images/zill.png" },
-                { name: "Kriknak", image: "images/kriknak.png" },
-                { name: "Ngộ Không", image: "images/ngo-khong.png" },
-                { name: "Keera", image: "images/keera.png" },
-                { name: "Enzo", image: "images/enzo.png" },
-                { name: "Yan", image: "images/yan.png" },
-                { name: "Volkath", image: "images/volkath.png" },
-                { name: "Ryoma", image: "images/ryoma.png" },
-                { name: "Astrid", image: "images/astrid.png" },
-                { name: "Qi", image: "images/qi.png" },
-                { name: "Bijan", image: "images/bijan.png" },
-                { name: "Paine", image: "images/paine.png" },
-                { name: "Bright", image: "images/bright.png" },
-                { name: "Allain", image: "images/allain.png" },
-                { name: "Zata", image: "images/zata.png" },
-                { name: "Raz", image: "images/raz.png" },
-                { name: "Dirak", image: "images/dirak.png" },
-                { name: "Tachi", image: "images/tachi.png" },
-                { name: "Errol", image: "images/errol.png" },
-                { name: "Zephys", image: "images/zephys.png" },
-                { name: "Superman", image: "images/superman.png" },
-                { name: "The Flash", image: "images/the-flash.png" },
-                { name: "Kaine", image: "images/kaine.png" },
-                { name: "Sinestrea", image: "images/sinestrea.png" }
-            ],
-            "do-don": [
-                { name: "Toro", image: "images/toro.png" },
-                { name: "Gildur", image: "images/gildur.png" },
-                { name: "Grakk", image: "images/grakk.png" },
-                { name: "Sephera", image: "images/sephera.png" },
-                { name: "Helen", image: "images/helen.png" },
-                { name: "Ishar", image: "images/ishar.png" },
-                { name: "Krizzix", image: "images/krizzix.png" },
-                { name: "Chaugnar", image: "images/chaugnar.png" },
-                { name: "Annette", image: "images/annette.png" },
-                { name: "Baldum", image: "images/baldum.png" },
-                { name: "Omega", image: "images/omega.png" },
-                { name: "Dolia", image: "images/dolia.png" },
-                { name: "Arum", image: "images/arum.png" },
-                { name: "Lumburr", image: "images/lumburr.png" },
-                { name: "Skud", image: "images/skud.png" },
-                { name: "Maloch", image: "images/maloch.png" },
-                { name: "Wiro", image: "images/wiro.png" },
-                { name: "Roxie", image: "images/roxie.png" },
-                { name: "Dextra", image: "images/dextra.png" },
-                { name: "Arduin", image: "images/arduin.png" },
-                { name: "Y’bneth", image: "images/ybneth.png" },
-                { name: "Cresht", image: "images/cresht.png" },
-                { name: "Thane", image: "images/thane.png" },
-                { name: "Taara", image: "images/taara.png" },
-                { name: "Mina", image: "images/mina.png" },
-                { name: "Xeniel", image: "images/xeniel.png" }
-            ],
-            "tro-thu": [
-                { name: "Alice", image: "images/alice.png" },
-                { name: "Annette", image: "images/annette.png" },
-                { name: "Sephera", image: "images/sephera.png" },
-                { name: "Krizzix", image: "images/krizzix.png" },
-                { name: "Chaugnar", image: "images/chaugnar.png" },
-                { name: "Baldum", image: "images/baldum.png" },
-                { name: "Omega", image: "images/omega.png" },
-                { name: "Dolia", image: "images/dolia.png" },
-                { name: "Arum", image: "images/arum.png" },
-                { name: "Lumburr", image: "images/lumburr.png" },
-                { name: "Teemee", image: "images/teemee.png" },
-                { name: "Zip", image: "images/zip.png" },
-                { name: "Rouie", image: "images/rouie.png" },
-                { name: "Helen", image: "images/helen.png" },
-                { name: "Ishar", image: "images/ishar.png" },
-                { name: "Y’bneth", image: "images/ybneth.png" },
-                { name: "Cresht", image: "images/cresht.png" },
-                { name: "Thane", image: "images/thane.png" },
-                { name: "Xeniel", image: "images/xeniel.png" }
-            ]
-       };
+  "dau-si": [
+    { name: "Zuka", image: "images/zuka.png" },
+    { name: "Veres", image: "images/veres.png" },
+    { name: "Richter", image: "images/richter.png" },
+    { name: "Rourke", image: "images/rourke.png" },
+    { name: "Airi", image: "images/airi.png" },
+    { name: "Arthur", image: "images/arthur.png" },
+    { name: "Superman", image: "images/superman.png" },
+    { name: "Zephys", image: "images/zephys.png" },
+    { name: "Triệu Vân", image: "images/trieu-van.png" },
+    { name: "Omen", image: "images/omen.png" },
+    { name: "Maloch", image: "images/maloch.png" },
+    { name: "Skud", image: "images/skud.png" },
+    { name: "Tachi", image: "images/tachi.png" },
+    { name: "Lữ Bố", image: "images/lu-bo.png" },
+    { name: "Kil’Groth", image: "images/kilgroth.png" },
+    { name: "Errol", image: "images/errol.png" },
+    { name: "Wiro", image: "images/wiro.png" },
+    { name: "Florentino", image: "images/florentino.png" },
+    { name: "Qi", image: "images/qi.png" },
+    { name: "Amily", image: "images/amily.png" },
+    { name: "Allain", image: "images/allain.png" },
+    { name: "Roxie", image: "images/roxie.png" },
+    { name: "Volkath", image: "images/volkath.png" },
+    { name: "Ryoma", image: "images/ryoma.png" },
+    { name: "Astrid", image: "images/astrid.png" },
+    { name: "Yan", image: "images/yan.png" },
+    { name: "Wonder Woman", image: "images/wonder-woman.png" },
+    { name: "Taara", image: "images/taara.png" },
+    { name: "Dextra", image: "images/dextra.png" },
+    { name: "Yena", image: "images/yena.png" },
+    { name: "Arduin", image: "images/arduin.png" },
+    { name: "Bijan", image: "images/bijan.png" },
+    { name: "Charlotte", image: "images/charlotte.png" },
+    { name: "Thorne", image: "images/thorne.png" },
+    { name: "Heino", image: "images/heino.png" },
+    { name: "Aoi", image: "images/aoi.png" },
+    { name: "Bolt Baron", image: "images/bolt-baron.png" },
+    { name: "Biron", image: "images/biron.png" },
+    { name: "Ormarr", image: "images/ormarr.png" },
+    { name: "Billow", image: "images/billow.png" }
+  ],
+  "phap-su": [
+    { name: "Dirak", image: "images/dirak.png" },
+    { name: "Raz", image: "images/raz.png" },
+    { name: "Preyta", image: "images/preyta.png" },
+    { name: "Natalya", image: "images/natalya.png" },
+    { name: "Ignis", image: "images/ignis.png" },
+    { name: "Lauriel", image: "images/lauriel.png" },
+    { name: "Điêu Thuyền", image: "images/dieu-thuyen.png" },
+    { name: "Veera", image: "images/veera.png" },
+    { name: "Marja", image: "images/marja.png" },
+    { name: "Tulen", image: "images/tulen.png" },
+    { name: "Krixi", image: "images/krixi.png" },
+    { name: "Mganga", image: "images/mganga.png" },
+    { name: "Liliana", image: "images/liliana.png" },
+    { name: "Kahlii", image: "images/kahlii.png" },
+    { name: "Yue", image: "images/yue.png" },
+    { name: "Annette", image: "images/annette.png" },
+    { name: "Sephera", image: "images/sephera.png" },
+    { name: "Ilumia", image: "images/ilumia.png" },
+    { name: "Ishar", image: "images/ishar.png" },
+    { name: "Zata", image: "images/zata.png" },
+    { name: "Jinna", image: "images/jinna.png" },
+    { name: "Aleister", image: "images/aleister.png" },
+    { name: "Azzen’Ka", image: "images/azzenka.png" },
+    { name: "D’Arcy", image: "images/darcy.png" },
+    { name: "Lorion", image: "images/lorion.png" },
+    { name: "Ming", image: "images/ming.png" },
+    { name: "Iggy", image: "images/iggy.png" },
+    { name: "Bonnie", image: "images/bonie.png" }
+  ],
+  "xa-thu": [
+    { name: "Valhein", image: "images/valhein.png" },
+    { name: "Violet", image: "images/violet.png" },
+    { name: "Yorn", image: "images/yorn.png" },
+    { name: "Fennik", image: "images/fennik.png" },
+    { name: "Slimz", image: "images/slimz.png" },
+    { name: "Tel’Annas", image: "images/telannas.png" },
+    { name: "Moren", image: "images/moren.png" },
+    { name: "Lindis", image: "images/lindis.png" },
+    { name: "Wisp", image: "images/wisp.png" },
+    { name: "Elsu", image: "images/elsu.png" },
+    { name: "Hayate", image: "images/hayate.png" },
+    { name: "Capheny", image: "images/capheny.png" },
+    { name: "Celica", image: "images/celica.png" },
+    { name: "Eland’orr", image: "images/elandorr.png" },
+    { name: "Laville", image: "images/laville.png" },
+    { name: "Thorne", image: "images/thorne.png" },
+    { name: "Bright", image: "images/bright.png" },
+    { name: "Heino", image: "images/heino.png" },
+    { name: "Teeri", image: "images/teeri.png" },
+    { name: "Yan", image: "images/yan.png" },
+    { name: "Stuart", image: "images/stuart.png" }
+  ],
+  "sat-thu": [
+    { name: "Nakroth", image: "images/nakroth.png" },
+    { name: "Murad", image: "images/murad.png" },
+    { name: "Quillen", image: "images/quillen.png" },
+    { name: "Airi", image: "images/airi.png" },
+    { name: "Butterfly", image: "images/butterfly.png" },
+    { name: "Zill", image: "images/zill.png" },
+    { name: "Kriknak", image: "images/kriknak.png" },
+    { name: "Ngộ Không", image: "images/ngo-khong.png" },
+    { name: "Keera", image: "images/keera.png" },
+    { name: "Enzo", image: "images/enzo.png" },
+    { name: "Yan", image: "images/yan.png" },
+    { name: "Volkath", image: "images/volkath.png" },
+    { name: "Ryoma", image: "images/ryoma.png" },
+    { name: "Astrid", image: "images/astrid.png" },
+    { name: "Qi", image: "images/qi.png" },
+    { name: "Bijan", image: "images/bijan.png" },
+    { name: "Paine", image: "images/paine.png" },
+    { name: "Bright", image: "images/bright.png" },
+    { name: "Allain", image: "images/allain.png" },
+    { name: "Zata", image: "images/zata.png" },
+    { name: "Raz", image: "images/raz.png" },
+    { name: "Dirak", image: "images/dirak.png" },
+    { name: "Tachi", image: "images/tachi.png" },
+    { name: "Errol", image: "images/errol.png" },
+    { name: "Zephys", image: "images/zephys.png" },
+    { name: "Superman", image: "images/superman.png" },
+    { name: "The Flash", image: "images/the-flash.png" },
+    { name: "Kaine", image: "images/kaine.png" },
+    { name: "Sinestrea", image: "images/sinestrea.png" }
+  ],
+  "do-don": [
+    { name: "Toro", image: "images/toro.png" },
+    { name: "Gildur", image: "images/gildur.png" },
+    { name: "Grakk", image: "images/grakk.png" },
+    { name: "Sephera", image: "images/sephera.png" },
+    { name: "Helen", image: "images/helen.png" },
+    { name: "Ishar", image: "images/ishar.png" },
+    { name: "Krizzix", image: "images/krizzix.png" },
+    { name: "Chaugnar", image: "images/chaugnar.png" },
+    { name: "Annette", image: "images/annette.png" },
+    { name: "Baldum", image: "images/baldum.png" },
+    { name: "Omega", image: "images/omega.png" },
+    { name: "Dolia", image: "images/dolia.png" },
+    { name: "Arum", image: "images/arum.png" },
+    { name: "Lumburr", image: "images/lumburr.png" },
+    { name: "Skud", image: "images/skud.png" },
+    { name: "Maloch", image: "images/maloch.png" },
+    { name: "Wiro", image: "images/wiro.png" },
+    { name: "Roxie", image: "images/roxie.png" },
+    { name: "Dextra", image: "images/dextra.png" },
+    { name: "Arduin", image: "images/arduin.png" },
+    { name: "Y’bneth", image: "images/ybneth.png" },
+    { name: "Cresht", image: "images/cresht.png" },
+    { name: "Thane", image: "images/thane.png" },
+    { name: "Taara", image: "images/taara.png" },
+    { name: "Mina", image: "images/mina.png" },
+    { name: "Xeniel", image: "images/xeniel.png" }
+  ],
+  "tro-thu": [
+    { name: "Alice", image: "images/alice.png" },
+    { name: "Annette", image: "images/annette.png" },
+    { name: "Sephera", image: "images/sephera.png" },
+    { name: "Krizzix", image: "images/krizzix.png" },
+    { name: "Chaugnar", image: "images/chaugnar.png" },
+    { name: "Baldum", image: "images/baldum.png" },
+    { name: "Omega", image: "images/omega.png" },
+    { name: "Dolia", image: "images/dolia.png" },
+    { name: "Arum", image: "images/arum.png" },
+    { name: "Lumburr", image: "images/lumburr.png" },
+    { name: "Teemee", image: "images/teemee.png" },
+    { name: "Zip", image: "images/zip.png" },
+    { name: "Rouie", image: "images/rouie.png" },
+    { name: "Helen", image: "images/helen.png" },
+    { name: "Ishar", image: "images/ishar.png" },
+    { name: "Y’bneth", image: "images/ybneth.png" },
+    { name: "Cresht", image: "images/cresht.png" },
+    { name: "Thane", image: "images/thane.png" },
+    { name: "Xeniel", image: "images/xeniel.png" }
+  ]
+};
 const tatCaTuong = Object.values(tuongList).flat();
 
 let currentRole = 'all'; // Biến lưu vai trò hiện tại
@@ -272,10 +411,10 @@ function renderTuong(list) {
 
   list.forEach(tuong => {
     const item = document.createElement('div');
-    item.className = "bg-[#2c2c5f] p-2 rounded-lg text-center text-white hover:bg-[#3c3c7f] cursor-pointer transition";
+    item.className = "hero-card";
 
     item.innerHTML = `
-      <img src="${tuong.image}" alt="${tuong.name}" class="w-30 h-30 mx-auto rounded-md">
+      <img src="${tuong.image}" alt="${tuong.name}" class="w-32 h-32 mx-auto rounded-md object-cover">
       <div class="text-sm font-bold mt-2">${tuong.name}</div>
     `;
 
@@ -320,7 +459,7 @@ function runRandomEffect(list, isTeam, callback) {
       resultDiv.innerHTML = `
         <div class="flex flex-wrap justify-center gap-4">
           ${tempTeam.map(tuong => `
-            <div class="text-center">
+            <div class="hero-card">
               <img src="${tuong.image}" alt="${tuong.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 spin object-cover">
               <div class="text-lg font-bold mt-2">${tuong.name}</div>
             </div>
@@ -344,7 +483,7 @@ function runRandomEffect(list, isTeam, callback) {
     const intervalId = setInterval(() => {
       const randomHero = list[Math.floor(Math.random() * list.length)];
       resultDiv.innerHTML = `
-        <div class="text-center">
+        <div class="hero-card">
           <img src="${randomHero.image}" alt="${randomHero.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 spin object-cover">
           <div class="text-xl font-bold mt-2">${randomHero.name}</div>
         </div>
@@ -371,7 +510,7 @@ function randomTuong() {
   runRandomEffect(list, false, () => {
     const randomHero = list[Math.floor(Math.random() * list.length)];
     document.getElementById('result').innerHTML = `
-      <div class="text-center">
+      <div class="hero-card">
         <img src="${randomHero.image}" alt="${randomHero.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 glow object-cover">
         <div class="text-xl font-bold mt-2">${randomHero.name}</div>
       </div>
@@ -394,7 +533,7 @@ function randomFullTeam() {
     document.getElementById('result').innerHTML = `
       <div class="flex flex-wrap justify-center gap-4">
         ${team.map(tuong => `
-          <div class="text-center">
+          <div class="hero-card">
             <img src="${tuong.image}" alt="${tuong.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 glow object-cover">
             <div class="text-lg font-bold mt-2">${tuong.name}</div>
           </div>
