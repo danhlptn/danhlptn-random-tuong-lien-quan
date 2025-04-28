@@ -39,12 +39,12 @@
 <body class="bg-[#1a1a2e] min-h-screen flex flex-col items-center p-4">
 
   <!-- Âm thanh -->
-  <audio id="rollSound" src="/sounds/roll-sound.mp3"></audio>
-  <audio id="resultSound" src="/sounds/result-sound.mp3"></audio>
+  <audio id="rollSound" src="sounds/roll-sound.mp3"></audio>
+  <audio id="resultSound" src="sounds/result-sound.mp3"></audio>
 
   <!-- Header: Logo -->
   <div class="my-4">
-    <img src="images/lien-quan-logo.png" alt="Liên Quân Mobile Logo" class="h-16 mx-auto">
+    <img src="images/lien-quan-logo.png" alt="Liên Quân Mobile Logo" class="h-24 mx-auto">
   </div>
 
   <!-- Filter Buttons -->
@@ -321,7 +321,7 @@ function runRandomEffect(list, isTeam, callback) {
         <div class="flex flex-wrap justify-center gap-4">
           ${tempTeam.map(tuong => `
             <div class="text-center">
-              <img src="${tuong.image}" alt="${tuong.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 spin">
+              <img src="${tuong.image}" alt="${tuong.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 spin object-cover">
               <div class="text-lg font-bold mt-2">${tuong.name}</div>
             </div>
           `).join('')}
@@ -345,7 +345,7 @@ function runRandomEffect(list, isTeam, callback) {
       const randomHero = list[Math.floor(Math.random() * list.length)];
       resultDiv.innerHTML = `
         <div class="text-center">
-          <img src="${randomHero.image}" alt="${randomHero.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 spin">
+          <img src="${randomHero.image}" alt="${randomHero.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 spin object-cover">
           <div class="text-xl font-bold mt-2">${randomHero.name}</div>
         </div>
       `;
@@ -372,7 +372,7 @@ function randomTuong() {
     const randomHero = list[Math.floor(Math.random() * list.length)];
     document.getElementById('result').innerHTML = `
       <div class="text-center">
-        <img src="${randomHero.image}" alt="${randomHero.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 glow">
+        <img src="${randomHero.image}" alt="${randomHero.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 glow object-cover">
         <div class="text-xl font-bold mt-2">${randomHero.name}</div>
       </div>
     `;
@@ -395,7 +395,7 @@ function randomFullTeam() {
       <div class="flex flex-wrap justify-center gap-4">
         ${team.map(tuong => `
           <div class="text-center">
-            <img src="${tuong.image}" alt="${tuong.name}" class="w-30 h-30 mx-auto rounded-md border-2 border-yellow-500 glow">
+            <img src="${tuong.image}" alt="${tuong.name}" class="w-32 h-32 mx-auto rounded-md border-2 border-yellow-500 glow object-cover">
             <div class="text-lg font-bold mt-2">${tuong.name}</div>
           </div>
         `).join('')}
